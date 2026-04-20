@@ -1,30 +1,27 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace ConsoleApp1
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
-            
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Training Center API", Version = "v1" });
+});
 
-            var app = builder.Build();
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+var app = builder.Build();
 
-            app.UseHttpsRedirection();
 
-            app.UseAuthorization();
-            app.MapControllers();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Training Center API v1");
+    c.RoutePrefix = "swagger"; 
+});
 
-            app.Run();
-        }
-    }
-}
+app.MapGet("/", () => Results.Redirect("/swagger"));
+
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();
